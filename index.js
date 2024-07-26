@@ -4,6 +4,7 @@ import multer from "multer";
 import { registerValidation, loginValidation, postCreateValidation } from "./validations.js";
 import  { UserController, PostController } from "./controllers/index.js";
 import { handleValidationErrors, checkAuth } from "./utils/index.js";
+import cors from "cors";
 
 mongoose
     .connect("mongodb+srv://denyszdor:ps1weyNIgG52TgDr@mymongocluster.idlop0b.mongodb.net/blog?retryWrites=true&w=majority&appName=MyMongoCluster")
@@ -13,6 +14,7 @@ mongoose
 const app = express();
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+app.use(cors());
 
 const storage = multer.diskStorage({
     destination: (_, __, cb) => {
