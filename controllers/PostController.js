@@ -5,7 +5,7 @@ export const create = async (req, res) => {
         const doc = new PostModel({
             title: req.body.title,
             text: req.body.text,
-            tags: req.body.tags,
+            tags: req.body.tags.split(',').map(tag => tag.trim()),
             imageUrl: req.body.imageUrl,
             user: req.userId,
         })
@@ -15,6 +15,22 @@ export const create = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Failed to create a post' });
+    }
+}
+
+export const getLastTags = async (req, res) => {
+    try {
+        const posts = await PostModel.find().limit(5).exec();
+
+        const tags = posts
+            .map(obj => obj.tags)
+            .flat()
+            .slice(0, 5);
+    
+        res.json(tags);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Failed to get last tags' });
     }
 }
 
@@ -37,7 +53,7 @@ export const getOne = async (req, res) => {
             { _id: postId },
             { $inc: { viewsCount: 1 } },
             { new: true }
-        )
+        ).populate('user');
         
         res.json(doc);
     } catch (error) {
@@ -74,7 +90,7 @@ export const update = async (req, res) => {
             {
                 title: req.body.title,
                 text: req.body.text,
-                tags: req.body.tags,
+                tags: req.body.tags.split(',').map(tag => tag.trim()),
                 imageUrl: req.body.imageUrl,
                 user: req.userId,
             }
